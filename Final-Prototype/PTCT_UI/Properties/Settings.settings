@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="MPR_UI.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="CT_DICOM_DIR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\DicomDataSet\PTCT\Dataset1\1.3.12.2.1107.5.1.4.1007.30000012032001413290600020180</Value>
+    </Setting>
+    <Setting Name="AxialColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Tomato</Value>
+    </Setting>
+    <Setting Name="CoronalColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">BlueViolet</Value>
+    </Setting>
+    <Setting Name="SagittalColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Gold</Value>
+    </Setting>
+    <Setting Name="PT_DICOM_DIR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">D:\DicomDataSet\PTCT\Dataset1\1.3.12.2.1107.5.1.4.1007.30000012032001433800000011963</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
