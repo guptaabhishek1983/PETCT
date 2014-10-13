@@ -31,7 +31,7 @@ MPR_UI_Interface::MPR_UI_Interface()
 		File::Delete("C:\\Temp\\MPR_View.log");
 	}
 	rad_setLogFileName("C:\\Temp\\MPR_View.log");
-	rad_setLogLevel(255);
+	rad_setLogLevel(7);
 }
 
 MPR_UI_Interface^ MPR_UI_Interface::GetHandle()
@@ -152,9 +152,90 @@ int MPR_UI_Interface::GetNumberOfImages(int axis)
 {
 	return this->m_mpr->GetNumberOfImages((Axis)axis);
 }
+
+void MPR_UI_Interface::RaiseSlicerPositionUpdate(int axis)
+{
+	double pos[2] = { 0, 0 };
+	GetCurrentSlicerPositionRelativeToIndex(axis, pos);
+	EventDelegate_BRIDGE::EDB::Instance->RaiseUpdateCursorPos(axis, pos[0], pos[1]);
+}
 void MPR_UI_Interface::Scroll(int axis, int delta)
 {
 	this->m_mpr->Scroll((Axis)axis, delta);
+
+	double ct_spacing[3] = { 0, 0, 0 };
+	this->m_mpr->GetInput()->GetSpacing(ct_spacing);
+	double ct_pos = this->m_mpr->GetCurrentImagePosition((Axis)axis);
+	double pt_translate = delta*ct_spacing[2];
+	if (axis == SagittalAxis)
+	{
+		pt_translate = delta*ct_spacing[0];
+	}
+	if (axis == CoronalAxis)
+	{
+		pt_translate = delta*ct_spacing[1];
+
+	}
+	this->m_pt_mpr->Scroll((Axis)axis, pt_translate);
+	/*double ct_pos = this->m_mpr->GetCurrentImagePosition((Axis)axis);
+	double pt_pos = this->m_pt_mpr->GetCurrentImagePosition((Axis)axis);
+	double pt_spacing[3] = { 0, 0, 0 };
+	this->m_pt_mpr->GetInput()->GetSpacing(pt_spacing);
+	switch (axis)
+	{
+		case Axis::AxialAxis:
+		{
+			if ((fabs(ct_pos) - fabs(pt_pos)) > fabs(pt_spacing[2]))
+			{
+				this->m_pt_mpr->Scroll((Axis)axis, delta);
+			}
+		}
+			break;
+		case SagittalAxis:
+		{
+			if ((fabs(ct_pos) - fabs(pt_pos)) > fabs(pt_spacing[0]))
+			{
+				this->m_pt_mpr->Scroll((Axis)axis, delta);
+			}
+		}
+		case CoronalAxis:
+		{
+			if ((fabs(ct_pos) - fabs(pt_pos)) > fabs(pt_spacing[1]))
+			{
+				this->m_pt_mpr->Scroll((Axis)axis, delta);
+			}
+		}
+		default:
+			break;
+	}*/
+	switch (axis)
+	{
+		case Axis::AxialAxis:
+		{
+			UpdateDisplay((int)AxialAxis, true);
+			RaiseSlicerPositionUpdate(SagittalAxis);
+			RaiseSlicerPositionUpdate(CoronalAxis);
+		}
+			break;
+		case SagittalAxis:
+		{
+			UpdateDisplay((int)SagittalAxis, true);
+			RaiseSlicerPositionUpdate(AxialAxis);
+			RaiseSlicerPositionUpdate(CoronalAxis);
+		}
+			break;
+
+		case CoronalAxis:
+		{
+			UpdateDisplay((int)CoronalAxis, true);
+			RaiseSlicerPositionUpdate(AxialAxis);
+			RaiseSlicerPositionUpdate(SagittalAxis);
+		}
+			break;
+		default:
+			break;
+	}
+	
 }
 
 int MPR_UI_Interface::GetCurrentImageIndex(int axis)
@@ -167,9 +248,12 @@ double MPR_UI_Interface::GetCurrentImagePosition(int axis)
 	return this->m_mpr->GetCurrentImagePosition((Axis)axis);
 }
 
-double MPR_UI_Interface::GetCurrentImagePositionRelativeToOrigin(int axis)
+void MPR_UI_Interface::GetCurrentSlicerPositionRelativeToIndex(int axis, double* pos)
 {
-	return this->m_mpr->GetCurrentImagePositionRelativeToOrigin((Axis)axis);
+	double xPos = 0, yPos = 0;
+	this->m_mpr->GetCurrentSlicerPositionRelativeToIndex((Axis)axis, xPos, yPos);
+	pos[0] = xPos;
+	pos[1] = yPos;
 }
 
 //TODO: Fix me
@@ -323,7 +407,10 @@ void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
 	double translateX = (ct_origin[0] - pt_origin[0]) / ct_spacing[0];
 	double translateY = (ct_origin[1] - pt_origin[1]) / ct_spacing[1];
 
-	EventDelegate_BRIDGE::EDB::Instance->RaiseUpdatePTCTImage(axis, ct_bmp, pt_bmp, translateX, translateY);
+	double ct_pos = this->m_mpr->GetCurrentImagePosition((Axis)axis);
+	double pt_pos = this->m_pt_mpr->GetCurrentImagePosition((Axis)axis);
+
+	EventDelegate_BRIDGE::EDB::Instance->RaiseUpdatePTCTImage(axis, ct_bmp, pt_bmp, translateX, translateY, ct_pos, pt_pos);
 
 	return;
 

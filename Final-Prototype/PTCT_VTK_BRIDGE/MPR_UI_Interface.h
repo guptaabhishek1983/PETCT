@@ -37,7 +37,7 @@ namespace PTCT_VTK_BRIDGE {
 		void Scroll(int axis, int delta);
 		int GetCurrentImageIndex(int axis);
 		double GetCurrentImagePosition(int axis);
-		double GetCurrentImagePositionRelativeToOrigin(int axis);
+		void GetCurrentSlicerPositionRelativeToIndex(int axis, double* pos);
 		void UpdateSlicerPosition(int axis, float x, float y);
 		String^ GetOrientationMarkerLeft(int axis);
 		String^ GetOrientationMarkerRight(int axis);
@@ -45,6 +45,7 @@ namespace PTCT_VTK_BRIDGE {
 		String^ GetOrientationMarkerBottom(int axis);
 
 		void InitDisplay(int axis);
+		void RaiseSlicerPositionUpdate(int axis);
 		// PT-CT Winform2 porject calls.
 
 		void LoadImages(String^ ctImage, String^ ptImage);

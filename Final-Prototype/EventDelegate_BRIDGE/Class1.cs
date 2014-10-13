@@ -28,7 +28,7 @@ namespace EventDelegate_BRIDGE
         #endregion
 
         #region Update image
-        public delegate void UpdatePTCTImage(int axis, BitmapWrapper ct_bmp, BitmapWrapper pt_bmp, double pt_pos_x, double pt_pos_y);
+        public delegate void UpdatePTCTImage(int axis, BitmapWrapper ct_bmp, BitmapWrapper pt_bmp, double pt_pos_x, double pt_pos_y,double ct_pos, double pt_pos);
         private UpdatePTCTImage m_updatePTCTImage;
         
         /// <summary>
@@ -56,16 +56,46 @@ namespace EventDelegate_BRIDGE
         /// <param name="pt_bmp">PT Bitmap</param>
         /// <param name="pt_pos_x">PT X:Pos</param>
         /// <param name="pt_pos_y">PT Y:Pos</param>
-        public void RaiseUpdatePTCTImage(int axis, BitmapWrapper ct_bmp, BitmapWrapper pt_bmp, double pt_pos_x, double pt_pos_y)
+        public void RaiseUpdatePTCTImage(int axis, BitmapWrapper ct_bmp, BitmapWrapper pt_bmp, double pt_pos_x, double pt_pos_y, double ct_pos, double pt_pos)
         {
             if (m_updatePTCTImage == null) return;
             var receivers = m_updatePTCTImage.GetInvocationList();
 
             foreach (UpdatePTCTImage receiver in receivers)
             {
-                receiver.BeginInvoke(axis, ct_bmp, pt_bmp, pt_pos_x, pt_pos_y, null, null);
+                receiver.BeginInvoke(axis, ct_bmp, pt_bmp, pt_pos_x, pt_pos_y, ct_pos, pt_pos, null, null);
             }
         }
         #endregion
+
+#region Update cursor position
+        public delegate void UpdateCursorPosition(int axis, double pos_x, double pos_y);
+        private UpdateCursorPosition m_updateCurPos;
+
+        public event UpdateCursorPosition EVT_UpdateCursorPos
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            add
+            {
+                m_updateCurPos = (UpdateCursorPosition)Delegate.Combine(m_updateCurPos, value);
+            }
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            remove
+            {
+                m_updateCurPos = (UpdateCursorPosition)Delegate.Remove(m_updateCurPos, value);
+            }
+        }
+
+        public void RaiseUpdateCursorPos(int axis, double pos_x, double pos_y)
+        {
+            if (m_updateCurPos == null) return;
+            var receivers = m_updateCurPos.GetInvocationList();
+
+            foreach (UpdateCursorPosition receiver in receivers)
+            {
+                receiver.BeginInvoke(axis, pos_x, pos_y, null, null);
+            }
+        }
+#endregion
     }
 }
