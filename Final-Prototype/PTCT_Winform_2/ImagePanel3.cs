@@ -42,6 +42,7 @@ namespace PTCT_Winform_2
 
             // handle resize
             this.Resize += new EventHandler(ImagePanel3_Resize);
+            
         }
 
         public ImagePanel3(IContainer container)
@@ -93,7 +94,7 @@ namespace PTCT_Winform_2
             Size effectivePanelSize = this.Size - new Size((10 + (int)(2 * this.BorderSize)), (10 + (int)(2 * this.BorderSize)));
             float diffHeight = ((float)effectivePanelSize.Height) / ((float)StoreBitmap.Height);
             float diffWidth = ((float)effectivePanelSize.Width) / ((float)StoreBitmap.Width);
-            zoom = Math.Min(diffHeight, diffWidth);
+            //zoom = Math.Min(diffHeight, diffWidth);
 
             int w = (int)(StoreBitmap.Width * zoom);
             int h = (int)(StoreBitmap.Height * zoom);
@@ -129,12 +130,42 @@ namespace PTCT_Winform_2
 
             if (m_pet_storedBitmap != null)
             {
-                PointF doseDisplayPosition1 = this.GetActualDisplayPosition(PetPosition);
-                //e.Graphics.DrawRectangle(new Pen(Color.Blue), doseDisplayPosition1.X, doseDisplayPosition1.Y, m_pet_storedBitmap.Width, m_pet_storedBitmap.Height);
+                //step1: find the center of CT Image rect
 
-                e.Graphics.DrawImage(this.m_pet_storedBitmap, roundedRectangle);
+                //step2: find displacement 
+                PointF doseDisplayPosition1 = new PointF( roundedRectangle.Left- PetPosition.X, roundedRectangle.Top-PetPosition.Y);// this.GetActualDisplayPosition(PetPosition);
+                //RectangleF doseRect = new RectangleF(doseDisplayPosition1, new SizeF(this.m_pet_storedBitmap.Width * (this.m_storedBitmap.Width / this.m_pet_storedBitmap.Width),
+                  // this.m_pet_storedBitmap.Height * (this.m_storedBitmap.Height / this.m_pet_storedBitmap.Height)));
+                e.Graphics.DrawRectangle(new Pen(Color.Blue), doseDisplayPosition1.X, doseDisplayPosition1.Y, m_pet_storedBitmap.Width, m_pet_storedBitmap.Height);
+
+                e.Graphics.DrawImage(this.m_pet_storedBitmap, doseDisplayPosition1);
+                //e.Graphics.DrawImage(this.m_pet_storedBitmap, roundedRectangle);
             }
+
+            Pen _pen1 = new Pen(Color.LightGoldenrodYellow, 2.0F);
+            Font _font = new Font("Verdana", 10.0F);
+            StringBuilder _sb = new StringBuilder();
+            _sb.Append("Zoom#");
+            _sb.Append(currentZoomFactor);
+            e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, 0));
             base.OnPaint(e);
+        }
+        protected override void OnMouseClick(MouseEventArgs e)
+        {
+            base.OnMouseClick(e);
+            this.lastMousePosition = new Point(e.X, e.Y);
+        }
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if(e.Button == System.Windows.Forms.MouseButtons.Left)
+            {
+                PointF relOffset = new PointF(lastMousePosition.X - e.X, lastMousePosition.Y - e.Y);
+                PetPosition = new PointF(PetPosition.X - (int)(relOffset.X / currentZoomFactor), PetPosition.Y - (int)(relOffset.Y / currentZoomFactor));
+                
+                Invalidate();
+            }
+            this.lastMousePosition = new Point(e.X, e.Y);
         }
 
         public PointF GetActualDisplayPosition(PointF point)

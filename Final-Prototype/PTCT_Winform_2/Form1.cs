@@ -29,17 +29,17 @@ namespace PTCT_Winform_2
 
             tableLayoutPanel1.SuspendLayout();
 
-            ctImage = new ImageControl(ViewType.CT);
-            ctImage.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Controls.Add(ctImage, 0, 0);
+           // ctImage = new ImageControl(ViewType.CT);
+            //ctImage.Dock = DockStyle.Fill;
+            //tableLayoutPanel1.Controls.Add(ctImage, 0, 0);
 
-            ptImage = new ImageControl(ViewType.PT);
-            ptImage.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Controls.Add(ptImage, 1, 0);
+            //ptImage = new ImageControl(ViewType.PT);
+           // ptImage.Dock = DockStyle.Fill;
+            //tableLayoutPanel1.Controls.Add(ptImage, 1, 0);
 
             fusedImage = new ImageControl(ViewType.FUSED);
             fusedImage.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Controls.Add(fusedImage, 2, 0);
+            tableLayoutPanel1.Controls.Add(fusedImage, 0, 0);
 
             tableLayoutPanel1.ResumeLayout();
 

@@ -40,6 +40,7 @@ namespace PTCT_Winform_2
                         img_panel.Dock = DockStyle.Fill;
                         this.panel1.Controls.Add(img_panel);
                         img_panel.StoreBitmap = ct_bmp.StoredBitmap;
+
                     }
                     break;
 
@@ -51,8 +52,9 @@ namespace PTCT_Winform_2
                         this.panel1.Controls.Add(img_panel);
                         img_panel.StoreBitmap = pt_bmp.StoredBitmap;
 
-                        BitmapWrapper pt_lut_bmp = this.m_bHandle.GetPT_LUTDisplay();
-                        img_panel.PET_StoreBitmap = pt_lut_bmp.StoredBitmap;
+                        //BitmapWrapper pt_lut_bmp = this.m_bHandle.GetPT_LUTDisplay();
+                        //pt_lut_bmp.Resize((int)(pt_lut_bmp.StoredBitmap.Width * img_panel.currentZoomFactor), (int)(pt_lut_bmp.StoredBitmap.Height * img_panel.currentZoomFactor));
+                        //img_panel.PET_StoreBitmap = pt_lut_bmp.StoredBitmap;
 
                     }
                     break;
@@ -65,11 +67,14 @@ namespace PTCT_Winform_2
                         this.panel1.Controls.Add(img_panel);
 
                         img_panel.StoreBitmap = ct_bmp.StoredBitmap;
-
-                        BitmapWrapper pt_bmp = this.m_bHandle.GetPT_LUTDisplay();
-                        img_panel.PET_StoreBitmap = pt_bmp.StoredBitmap;
                         
+                        BitmapWrapper pt_bmp = this.m_bHandle.GetPT_LUTDisplay();
+                        //pt_bmp.Resize((int)(pt_bmp.StoredBitmap.Width * img_panel.currentZoomFactor), (int)(pt_bmp.StoredBitmap.Height * img_panel.currentZoomFactor));
+                        img_panel.PetPosition = new PointF((float)(this.m_bHandle.GetTranslateX()), (float)(this.m_bHandle.GetTranslateY()));
+                        img_panel.PET_StoreBitmap = pt_bmp.StoredBitmap;
 
+
+                        
                     }
                     break;
 

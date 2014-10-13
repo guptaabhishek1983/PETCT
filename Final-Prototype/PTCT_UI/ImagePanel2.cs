@@ -294,7 +294,7 @@ namespace MPR_UI
             if(m_pet_storedBitmap!=null)
             {
                 PointF doseDisplayPosition1 = this.GetActualDisplayPosition(PetPosition);
-                //e.Graphics.DrawRectangle(new Pen(Color.Blue), doseDisplayPosition1.X, doseDisplayPosition1.Y, m_pet_storedBitmap.Width, m_pet_storedBitmap.Height);
+                e.Graphics.DrawRectangle(new Pen(Color.Blue), doseDisplayPosition1.X, doseDisplayPosition1.Y, m_pet_storedBitmap.Width, m_pet_storedBitmap.Height);
 
                 e.Graphics.DrawImage(this.m_pet_storedBitmap, doseDisplayPosition1);
             }

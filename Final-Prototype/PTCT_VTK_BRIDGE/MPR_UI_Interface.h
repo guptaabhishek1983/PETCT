@@ -23,7 +23,8 @@ namespace PTCT_VTK_BRIDGE {
 		BitmapWrapper^ ct_bmp;
 		BitmapWrapper^ pt_bmp;
 		BitmapWrapper^ pt_lut_bmp;
-
+		double m_translateX;
+		double m_translateY;
 	public: // methods
 		static MPR_UI_Interface^ GetHandle();
 		~MPR_UI_Interface(void);
@@ -49,7 +50,8 @@ namespace PTCT_VTK_BRIDGE {
 		BitmapWrapper^ GetCTDisplay() { return ct_bmp; }
 		BitmapWrapper^ GetPTDisplay() { return pt_bmp; }
 		BitmapWrapper^ GetPT_LUTDisplay() { return pt_lut_bmp; }
-
+		double GetTranslateX(){ return m_translateX; }
+		double GetTranslateY(){ return m_translateY; }
 	public: //delegates
 		delegate void CursorTranslationCompleted();
 		delegate void UpdateImage(BitmapWrapper^ bmpWrapper, BitmapWrapper^ ptBmpWrapper, int axis, double reslicerPositionX, double reslicerPositionY);

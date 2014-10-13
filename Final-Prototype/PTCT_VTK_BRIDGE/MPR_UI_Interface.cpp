@@ -84,8 +84,8 @@ void MPR_UI_Interface::Init_PT_MPR(String^ path)
 BitmapWrapper^ MPR_UI_Interface::GetDisplayImage(int axis)
 {
 	image displayImage = this->m_mpr->GetOutputImage((Axis)axis);
-	int newWidth, newHeight;
-	this->m_mpr->GetOutputImageDisplayDimensions((Axis)axis, newWidth, newHeight);
+//	int newWidth, newHeight;
+	//this->m_mpr->GetOutputImageDisplayDimensions((Axis)axis, newWidth, newHeight);
 
 	BitmapWrapper^ bmp = gcnew BitmapWrapper(displayImage.data, displayImage.width, displayImage.height, "MONOCHROME");
 	//bmp->Resize(newWidth, newHeight);
@@ -331,6 +331,24 @@ void MPR_UI_Interface::LoadImages(String^ ctImage, String^ ptImage)
 	const char* pt_file = convert_to_const_charPtr(ptImage);
 
 	RadRTDicomInterface* ctDicom = new RTDcmtkDicomInterface(ct_file);
+	double ct_spacing[2] = { 0, 0 };
+	vector<string> ctPixelSpacing;
+	tokenize(ctDicom->Get_PIXEL_SPACING(), ctPixelSpacing, "\\");
+	ct_spacing[0] = convert_to_double(ctPixelSpacing[0].c_str());
+	ct_spacing[1] = convert_to_double(ctPixelSpacing[1].c_str());
+	double ctImagePosition[6] = { 0, 0, 0, 0, 0, 0 };
+
+	{
+		string imagePosition = string(ctDicom->Get_IMAGE_POSITION());
+		vector<string> _imgPosition;
+		tokenize(imagePosition, _imgPosition, "\\", true);
+
+		for (int i = 0; i < _imgPosition.size(); i++)
+		{
+			ctImagePosition[i] = convert_to_double(_imgPosition.at(i).c_str());
+		}
+	}
+
 	image ct_display = ::born_image();
 	ct_display.height = ctDicom->Get_ROW();
 	ct_display.width = ctDicom->Get_COLOUMN();
@@ -342,9 +360,28 @@ void MPR_UI_Interface::LoadImages(String^ ctImage, String^ ptImage)
 
 	this->ct_bmp = gcnew BitmapWrapper(ct_display.data, ct_display.width, ct_display.height, "MONOCHROME");
 
-	this->ct_bmp->Resize(ct_display.width* 0.9765625, ct_display.height* 0.9765625);
+	//this->ct_bmp->Resize(ct_display.width* 0.9765625, ct_display.height* 0.9765625);
 	
 	RadRTDicomInterface* ptDicom = new RTDcmtkDicomInterface(pt_file);
+	double pt_spacing[2] = { 0, 0 };
+	vector<string> ptPixelSpacing;
+	tokenize(ptDicom->Get_PIXEL_SPACING(), ptPixelSpacing, "\\");
+	pt_spacing[0] = convert_to_double(ptPixelSpacing[0].c_str());
+	pt_spacing[1] = convert_to_double(ptPixelSpacing[1].c_str());
+
+	double ptImagePosition[6] = { 0, 0, 0, 0, 0, 0 };
+
+	{
+		string imagePosition = string(ptDicom->Get_IMAGE_POSITION());
+		vector<string> _imgPosition;
+		tokenize(imagePosition, _imgPosition, "\\", true);
+
+		for (int i = 0; i < _imgPosition.size(); i++)
+		{
+			ptImagePosition[i] = convert_to_double(_imgPosition.at(i).c_str());
+		}
+	}
+
 	image pt_display = ::born_image();
 	pt_display.height = ptDicom->Get_ROW();
 	pt_display.width = ptDicom->Get_COLOUMN();
@@ -355,9 +392,9 @@ void MPR_UI_Interface::LoadImages(String^ ctImage, String^ ptImage)
 	::GetDisplayImage(ptDicom, pt_display);
 
 	this->pt_bmp = gcnew BitmapWrapper(pt_display.data, pt_display.width, pt_display.height, "MONOCHROME");
-	this->pt_bmp->Resize(ct_display.width* 0.9765625, ct_display.height* 0.9765625);
+	//this->pt_bmp->Resize(pt_display.width* 3.3, pt_display.height* 3.3);
 	this->m_pet = gcnew PET();
-	this->m_pet->SetupLookupTable("D:\\GIT-HUB\\Repo1\\PT-CT\\Final-Prototype\\LUT\\HotIron.xml");
+	this->m_pet->SetupLookupTable("D:\\GIT-HUB\\PETCT\\Final-Prototype\\LUT\\HotIron.xml");
 
 	U8Data r1 = (U8Data)rad_get_memory(pt_display.size);
 	U8Data g1 = (U8Data)rad_get_memory(pt_display.size);
@@ -395,7 +432,10 @@ void MPR_UI_Interface::LoadImages(String^ ctImage, String^ ptImage)
 	//decode_rgb_to_argb(r1, g1, b1, (U32Data)_rgb_display_image.data, displayImage.size);
 
 	this->pt_lut_bmp = gcnew BitmapWrapper(_rgb_display_image.data, _rgb_display_image.width, _rgb_display_image.height, "RGB");
-	this->pt_lut_bmp->Resize(ct_display.width* 0.9765625, ct_display.height* 0.9765625);
+
+	this->pt_lut_bmp->Resize(_rgb_display_image.width * (pt_spacing[0] / ct_spacing[0]) ,
+		_rgb_display_image.height * (pt_spacing[1] / ct_spacing[1]) );
+
 	this->pt_lut_bmp->ChangeImageOpacity(0.7);
 	rad_free_memory(r1);
 	rad_free_memory(g1);
@@ -404,6 +444,8 @@ void MPR_UI_Interface::LoadImages(String^ ctImage, String^ ptImage)
 	die_image(pt_display);
 	die_image(ct_display);
 
+	this->m_translateX = (ctImagePosition[0] - ptImagePosition[0]) / ct_spacing[0];
+	this->m_translateY = (ctImagePosition[1] - ptImagePosition[1]) / ct_spacing[1];
 	return;
 }
 
