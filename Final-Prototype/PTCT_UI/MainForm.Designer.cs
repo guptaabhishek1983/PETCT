@@ -30,7 +30,9 @@
         {
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.axialPanel = new System.Windows.Forms.Panel();
+            this.sagittalPanel = new System.Windows.Forms.Panel();
+            this.coronalPanel = new System.Windows.Forms.Panel();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -43,7 +45,9 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.tableLayoutPanel1.Controls.Add(this.button1, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.button2, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.axialPanel, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.sagittalPanel, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.coronalPanel, 2, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -65,16 +69,29 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // button2
+            // axialPanel
             // 
-            this.button2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button2.Location = new System.Drawing.Point(245, 481);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(232, 24);
-            this.button2.TabIndex = 1;
-            this.button2.Text = "Load PT";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.axialPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.axialPanel.Location = new System.Drawing.Point(5, 5);
+            this.axialPanel.Name = "axialPanel";
+            this.axialPanel.Size = new System.Drawing.Size(232, 468);
+            this.axialPanel.TabIndex = 1;
+            // 
+            // sagittalPanel
+            // 
+            this.sagittalPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.sagittalPanel.Location = new System.Drawing.Point(245, 5);
+            this.sagittalPanel.Name = "sagittalPanel";
+            this.sagittalPanel.Size = new System.Drawing.Size(232, 468);
+            this.sagittalPanel.TabIndex = 2;
+            // 
+            // coronalPanel
+            // 
+            this.coronalPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.coronalPanel.Location = new System.Drawing.Point(485, 5);
+            this.coronalPanel.Name = "coronalPanel";
+            this.coronalPanel.Size = new System.Drawing.Size(233, 468);
+            this.coronalPanel.TabIndex = 3;
             // 
             // MainForm
             // 
@@ -95,7 +112,9 @@
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Panel axialPanel;
+        private System.Windows.Forms.Panel sagittalPanel;
+        private System.Windows.Forms.Panel coronalPanel;
 
     }
 }

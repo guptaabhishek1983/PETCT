@@ -108,6 +108,9 @@
     <Image Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EventDelegate_BRIDGE\EventDelegate_BRIDGE.csproj">
+      <Project>{ea341589-f33e-45d8-b903-5863cfc8e58f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\ImageUtils\ImageUtils.csproj">
       <Project>{a09cb6bf-af08-4830-9480-8ea80fa0f685}</Project>
     </ProjectReference>

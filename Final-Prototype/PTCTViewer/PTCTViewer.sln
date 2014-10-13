@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PTCT_Winform_2", "..\PTCT_W
 		{A9BD5DAF-31FD-4A03-AC55-6E9BFB71BB17} = {A9BD5DAF-31FD-4A03-AC55-6E9BFB71BB17}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EventDelegate_BRIDGE", "..\EventDelegate_BRIDGE\EventDelegate_BRIDGE.csproj", "{EA341589-F33E-45D8-B903-5863CFC8E58F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,16 @@ Global
 		{3DD9FC50-F7BD-46D8-B99E-CCBB2C8FB220}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3DD9FC50-F7BD-46D8-B99E-CCBB2C8FB220}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{3DD9FC50-F7BD-46D8-B99E-CCBB2C8FB220}.Release|Win32.ActiveCfg = Release|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{EA341589-F33E-45D8-B903-5863CFC8E58F}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

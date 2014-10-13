@@ -32,7 +32,7 @@ namespace radspeed
 		string GetOrientationMarkerBottom(Axis axis);
 
 		void GetOrigin(double& x, double& y, double& z);
-
+		vtkSmartPointer<vtkImageData> GetInput();
 	private:
 		MPRData* d;
 	};

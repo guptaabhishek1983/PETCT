@@ -568,3 +568,8 @@ void MPR::GetOrigin(double& x, double& y, double& z)
 {
 	d->GetInput()->GetOrigin(x, y, z);
 }
+
+vtkSmartPointer<vtkImageData> MPR::GetInput()
+{
+	return d->GetInput();
+}

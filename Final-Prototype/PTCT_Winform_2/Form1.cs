@@ -13,7 +13,6 @@ namespace PTCT_Winform_2
     public partial class Form1 : Form
     {
         private MPR_UI_Interface m_bHandle;
-        private ImageControl ctImage;
         public Form1()
         {
             InitializeComponent();
