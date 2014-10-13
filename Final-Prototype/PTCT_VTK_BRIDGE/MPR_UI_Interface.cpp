@@ -17,6 +17,7 @@ using namespace System::Xml;
 
 using namespace PTCT_VTK_BRIDGE;
 using namespace ImageUtils;
+using namespace EventDelegate_BRIDGE;
 
 #define __FILENAME__ "MPR_UI_Interface.cpp"
 #undef __MODULENAME__
@@ -64,7 +65,7 @@ void MPR_UI_Interface::InitMPR(String^ path)
 void MPR_UI_Interface::Init_PT_MPR(String^ path)
 {
 	this->m_pet = gcnew PET();
-	this->m_pet->SetupLookupTable("D:\\GIT-HUB\\Repo1\\PT-CT\\Final-Prototype\\LUT\\HotIron.xml");
+	this->m_pet->SetupLookupTable("D:\\GIT-HUB\\PETCT\\Final-Prototype\\LUT\\HotIron.xml");
 
 	this->m_pt_mpr = new MPR();
 
@@ -84,15 +85,12 @@ void MPR_UI_Interface::Init_PT_MPR(String^ path)
 BitmapWrapper^ MPR_UI_Interface::GetDisplayImage(int axis)
 {
 	image displayImage = this->m_mpr->GetOutputImage((Axis)axis);
-//	int newWidth, newHeight;
-	//this->m_mpr->GetOutputImageDisplayDimensions((Axis)axis, newWidth, newHeight);
 
 	BitmapWrapper^ bmp = gcnew BitmapWrapper(displayImage.data, displayImage.width, displayImage.height, "MONOCHROME");
-	//bmp->Resize(newWidth, newHeight);
 	return bmp;
 
 }
-BitmapWrapper^ MPR_UI_Interface::GetPTDisplayImage(int axis, bool applyLut, double^ tx, double^ ty)
+BitmapWrapper^ MPR_UI_Interface::GetPTDisplayImage(int axis, bool applyLut)
 {
 
 	image displayImage = this->m_pt_mpr->GetOutputImage((Axis)axis);
@@ -147,43 +145,6 @@ BitmapWrapper^ MPR_UI_Interface::GetPTDisplayImage(int axis, bool applyLut, doub
 	{
 		bmp = gcnew BitmapWrapper(displayImage.data, displayImage.width, displayImage.height, "MONOCHROME");
 	}
-	int newWidth, newHeight;
-	this->m_pt_mpr->GetOutputImageDisplayDimensions((Axis)axis, newWidth, newHeight);
-
-	//bmp->Resize(newWidth, newHeight);
-
-	// find translation
-	double x, y, z;
-	this->m_mpr->GetOrigin(x,y,z);
-
-	double x1, y1, z1;
-	this->m_pt_mpr->GetOrigin(x1, y1, z1);
-	
-	switch (axis)
-	{
-		case AxialAxis:
-		{
-			// translate the point to origin
-			tx = fabs(x - x1);
-			ty = fabs(y - y1);
-		}
-			break;
-
-		case SagittalAxis:
-		{
-			tx = fabs(y- y1);
-			ty = fabs(z- z1);
-		}
-			break;
-
-		case CoronalAxis:
-		{
-			tx = fabs(x - x1);
-			ty = fabs(z - z1);
-		}
-			break;
-	}
-
 	return bmp;
 }
 
@@ -211,9 +172,10 @@ double MPR_UI_Interface::GetCurrentImagePositionRelativeToOrigin(int axis)
 	return this->m_mpr->GetCurrentImagePositionRelativeToOrigin((Axis)axis);
 }
 
+//TODO: Fix me
 void MPR_UI_Interface::UpdateSlicerPosition(int axis, float x, float y)
 {
-	switch ((Axis)axis)
+	/*switch ((Axis)axis)
 	{
 		case AxialAxis:
 		{
@@ -259,7 +221,7 @@ void MPR_UI_Interface::UpdateSlicerPosition(int axis, float x, float y)
 			break;
 		default:
 			break;
-	}
+	}*/
 }
 
 String^ MPR_UI_Interface::GetOrientationMarkerLeft(int axis)
@@ -279,6 +241,97 @@ String^ MPR_UI_Interface::GetOrientationMarkerBottom(int axis)
 	return convert_to_managed_string(this->m_mpr->GetOrientationMarkerBottom((Axis)axis));
 }
 
+void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
+{
+	image ct_displayImage = this->m_mpr->GetOutputImage((Axis)axis);
+
+	BitmapWrapper^ ct_bmp = gcnew BitmapWrapper(ct_displayImage.data, ct_displayImage.width, ct_displayImage.height, "MONOCHROME");
+
+
+	image pt_displayImage = this->m_pt_mpr->GetOutputImage((Axis)axis);
+
+	BitmapWrapper^ pt_bmp = nullptr;
+	// Apply LUT
+	if (applyLut)
+	{
+		U8Data r1 = (U8Data)rad_get_memory(pt_displayImage.size);
+		U8Data g1 = (U8Data)rad_get_memory(pt_displayImage.size);
+		U8Data b1 = (U8Data)rad_get_memory(pt_displayImage.size);
+
+		for (int i = 0; i < pt_displayImage.size; i++)
+		{
+			int r, g, b;
+			this->m_pet->GetLookupValue(((U8Data)pt_displayImage.data)[i], r, g, b);
+			r1[i] = r;
+			g1[i] = g;
+			b1[i] = b;
+		}
+
+		image _rgb_display_image = ::born_image();
+		_rgb_display_image.height = pt_displayImage.height;
+		_rgb_display_image.width = pt_displayImage.width;
+		_rgb_display_image.size = pt_displayImage.size;
+		_rgb_display_image.data = rad_get_memory(pt_displayImage.size*rad_sizeof(TYPE_U32Data));
+
+		unsigned char*p = NULL;
+
+		for (u_int i = 0; i<pt_displayImage.size; i++)
+		{
+			p = (unsigned char*)((U32Data)_rgb_display_image.data + i);
+			*p = b1[i];
+			p++;
+			*p = g1[i];
+			p++;
+			*p = r1[i];
+			p++;
+			*p = 125;
+		}
+
+		//decode_rgb_to_argb(r1, g1, b1, (U32Data)_rgb_display_image.data, displayImage.size);
+
+		pt_bmp = gcnew BitmapWrapper(_rgb_display_image.data, _rgb_display_image.width, _rgb_display_image.height, "RGB");
+		pt_bmp->ChangeImageOpacity(0.7);
+		rad_free_memory(r1);
+		rad_free_memory(g1);
+		rad_free_memory(b1);
+		die_image(_rgb_display_image);
+	}
+	else
+	{
+		pt_bmp = gcnew BitmapWrapper(pt_displayImage.data, pt_displayImage.width, pt_displayImage.height, "MONOCHROME");
+	}
+
+	// resize
+	vtkSmartPointer<vtkImageData> ct_cuboid = this->m_mpr->GetInput();
+	double ct_spacing[3] = { 0, 0, 0 };
+	ct_cuboid->GetSpacing(ct_spacing);
+
+	double ct_origin[3] = { 0, 0, 0 };
+	ct_cuboid->GetOrigin(ct_origin);
+
+	vtkSmartPointer<vtkImageData> pt_cuboid = this->m_pt_mpr->GetInput();
+	double pt_spacing[3] = { 0, 0, 0 };
+	pt_cuboid->GetSpacing(pt_spacing);
+
+	double pt_origin[3] = { 0, 0, 0 };
+	pt_cuboid->GetOrigin(pt_origin);
+
+	pt_bmp->Resize(pt_displayImage .width *(pt_spacing[0] / ct_spacing[0]),
+		pt_displayImage.height * (pt_spacing[1] / ct_spacing[1]));
+
+
+	double translateX = (ct_origin[0] - pt_origin[0]) / ct_spacing[0];
+	double translateY = (ct_origin[1] - pt_origin[1]) / ct_spacing[1];
+
+	EventDelegate_BRIDGE::EDB::Instance->RaiseUpdatePTCTImage(axis, ct_bmp, pt_bmp, translateX, translateY);
+
+	return;
+
+}
+void MPR_UI_Interface::InitDisplay(int axis)
+{
+	UpdateDisplay(axis, true);
+}
 // meddiff includes
 #include "rad_util.h"
 #include "rad_logger.h"

@@ -31,15 +31,20 @@ namespace MPR_UI
 
             axialImage = new ImageControl(Axis.AxialAxis);
             axialImage.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Controls.Add(axialImage, 0, 0);
+            
+            axialPanel.Controls.Add(axialImage);
+      
+            //tableLayoutPanel1.Controls.Add(axialImage, 0, 0);
 
             sagittalImage = new ImageControl(Axis.SagittalAxis);
             sagittalImage.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Controls.Add(sagittalImage, 1, 0);
+            sagittalPanel.Controls.Add(sagittalImage);
+            //tableLayoutPanel1.Controls.Add(sagittalImage, 1, 0);
 
             coronalImage = new ImageControl(Axis.CoronalAxis);
             coronalImage.Dock = DockStyle.Fill;
-            tableLayoutPanel1.Controls.Add(coronalImage, 2, 0);
+            coronalPanel.Controls.Add(coronalImage);
+            //tableLayoutPanel1.Controls.Add(coronalImage, 2, 0);
             
             tableLayoutPanel1.ResumeLayout();
             MessageBox.Show("Done");
@@ -56,9 +61,11 @@ namespace MPR_UI
             MPR_UI_Interface ui_interface = MPR_UI_Interface.GetHandle();
             ui_interface.InitMPR(Settings.Default.CT_DICOM_DIR);
             ui_interface.Init_PT_MPR(Settings.Default.PT_DICOM_DIR);
-            axialImage.InitScrollBarAndLoadImage();
-            sagittalImage.InitScrollBarAndLoadImage();
-            coronalImage.InitScrollBarAndLoadImage();
+            axialImage.Init();
+            sagittalImage.Init();
+            coronalImage.Init();
+            //sagittalImage.InitScrollBarAndLoadImage();
+            //coronalImage.InitScrollBarAndLoadImage();
             MessageBox.Show("CT Loaded");
         }
 
@@ -69,13 +76,13 @@ namespace MPR_UI
 
         private void button2_Click(object sender, EventArgs e)
         {
-            button2.Enabled = false;
+            //button2.Enabled = false;
             //MPR_UI_Interface ui_interface = MPR_UI_Interface.GetHandle();
             //ui_interface.Init_PT_MPR(Settings.Default.PT_DICOM_DIR);
             //axialImage.LoadPTImage();
             //sagittalImage.LoadPTImage();
             //coronalImage.LoadPTImage();
-            MessageBox.Show("PT Loaded");
+            //MessageBox.Show("PT Loaded");
         }
     }
 }

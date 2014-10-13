@@ -94,7 +94,7 @@ namespace PTCT_Winform_2
             Size effectivePanelSize = this.Size - new Size((10 + (int)(2 * this.BorderSize)), (10 + (int)(2 * this.BorderSize)));
             float diffHeight = ((float)effectivePanelSize.Height) / ((float)StoreBitmap.Height);
             float diffWidth = ((float)effectivePanelSize.Width) / ((float)StoreBitmap.Width);
-            //zoom = Math.Min(diffHeight, diffWidth);
+            zoom = Math.Min(diffHeight, diffWidth);
 
             int w = (int)(StoreBitmap.Width * zoom);
             int h = (int)(StoreBitmap.Height * zoom);
@@ -130,16 +130,28 @@ namespace PTCT_Winform_2
 
             if (m_pet_storedBitmap != null)
             {
-                //step1: find the center of CT Image rect
+                ///step1: find the center of CT Image rect
+                Point center_point_ct = new Point(roundedRectangle.Left + roundedRectangle.Width / 2,
+                    roundedRectangle.Top + roundedRectangle.Height / 2);
 
-                //step2: find displacement 
-                PointF doseDisplayPosition1 = new PointF( roundedRectangle.Left- PetPosition.X, roundedRectangle.Top-PetPosition.Y);// this.GetActualDisplayPosition(PetPosition);
-                //RectangleF doseRect = new RectangleF(doseDisplayPosition1, new SizeF(this.m_pet_storedBitmap.Width * (this.m_storedBitmap.Width / this.m_pet_storedBitmap.Width),
-                  // this.m_pet_storedBitmap.Height * (this.m_storedBitmap.Height / this.m_pet_storedBitmap.Height)));
-                e.Graphics.DrawRectangle(new Pen(Color.Blue), doseDisplayPosition1.X, doseDisplayPosition1.Y, m_pet_storedBitmap.Width, m_pet_storedBitmap.Height);
+                ///step2: calculate PT image display rect 
+                PointF ptDisplayPosition1 = new PointF( roundedRectangle.Left- PetPosition.X, roundedRectangle.Top-PetPosition.Y);
+             
+                Rectangle pt_rect= new Rectangle( (int)(ptDisplayPosition1.X),  (int)(ptDisplayPosition1.Y),  (int)(m_pet_storedBitmap.Width*currentZoomFactor),  (int)(m_pet_storedBitmap.Height*currentZoomFactor));
 
-                e.Graphics.DrawImage(this.m_pet_storedBitmap, doseDisplayPosition1);
-                //e.Graphics.DrawImage(this.m_pet_storedBitmap, roundedRectangle);
+                /// find center point of PT image rect
+                Point center_point_pt = new Point(pt_rect.Left + pt_rect.Width / 2,
+                    pt_rect.Top + pt_rect.Height / 2);
+
+                // step3: map center of CT and PT rect;
+                // CT rect is fixed; PT rect is movable.
+                Point displacement = new Point(center_point_ct.X - center_point_pt.X,center_point_ct.Y - center_point_pt.Y);
+
+                /// step4: displace pt_rect
+                pt_rect.Offset(displacement);
+
+                e.Graphics.DrawRectangle(new Pen(Color.Blue), pt_rect);
+                e.Graphics.DrawImage(this.m_pet_storedBitmap, pt_rect);
             }
 
             Pen _pen1 = new Pen(Color.LightGoldenrodYellow, 2.0F);
