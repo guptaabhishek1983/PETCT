@@ -70,13 +70,13 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>..\MPR_VTK_Core;$(RT_MS_SDK_ROOT)\include\rad_utils\2.0.0;$(RT_MS_SDK_ROOT)\include\rt_dicom_util\1.0.0;$(RT_MS_SDK_ROOT)\include\dcmtk\3.6.0.3\include;$(RT_MS_SDK_ROOT)\include\vtk\6.1.0;$(RT_MS_SDK_ROOT)\include\InstaRT;$(RT_MS_SDK_ROOT)\include\bcl\1.0.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\PTCT_VTK_CORE;$(RT_MS_SDK_ROOT)\include\rad_utils\2.0.0;$(RT_MS_SDK_ROOT)\include\rt_dicom_util\1.0.0;$(RT_MS_SDK_ROOT)\include\dcmtk\3.6.0.3\include;$(RT_MS_SDK_ROOT)\include\vtk\6.1.0;$(RT_MS_SDK_ROOT)\include\InstaRT;$(RT_MS_SDK_ROOT)\include\bcl\1.0.0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Advapi32.lib;WS2_32.lib;NetAPI32.lib;rad_util.lib;bcl.lib;RTDicomUtil.lib;rad_streaming_encode.lib;dcmdata.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmimage.lib;dcmimgle.lib;dcmjpeg.lib;dcmnet.lib;ofstd.lib;oflog.lib;vtkCommonCore-6.1.lib;vtkImagingCore-6.1.lib;vtkImagingColor-6.1.lib;vtkCommonExecutionModel-6.1.lib;vtkCommonDataModel-6.1.lib;vtkalglib-6.1.lib;vtkmetaio-6.1.lib;vtkIOCore-6.1.lib;vtkIOLegacy-6.1.lib;vtkIOImage-6.1.lib;vtkImagingSources-6.1.lib;vtkFiltersCore-6.1.lib;vtkCommonTransforms-6.1.lib;vtkCommonMath-6.1.lib;vtkDICOMParser-6.1.lib;MPR_VTK_Core.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\MPRViewer\Release;$(RT_MS_SDK_ROOT)\lib\Release\vtk\6.1.0\lib;$(RT_MS_SDK_ROOT)\lib\Release\rad_utils\2.0.0;$(RT_MS_SDK_ROOT)\lib\Release\rt_dicom_util\1.0.0;$(RT_MS_SDK_ROOT)\lib\Release\dcmtk\3.6.0.3;$(RT_MS_SDK_ROOT)\lib\Release\InstaRT;$(RT_MS_SDK_ROOT)\lib\Release\bcl\1.0.0;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Advapi32.lib;WS2_32.lib;NetAPI32.lib;rad_util.lib;bcl.lib;RTDicomUtil.lib;rad_streaming_encode.lib;dcmdata.lib;ijg8.lib;ijg12.lib;ijg16.lib;dcmimage.lib;dcmimgle.lib;dcmjpeg.lib;dcmnet.lib;ofstd.lib;oflog.lib;vtkCommonCore-6.1.lib;vtkImagingCore-6.1.lib;vtkImagingColor-6.1.lib;vtkCommonExecutionModel-6.1.lib;vtkCommonDataModel-6.1.lib;vtkalglib-6.1.lib;vtkmetaio-6.1.lib;vtkIOCore-6.1.lib;vtkIOLegacy-6.1.lib;vtkIOImage-6.1.lib;vtkImagingSources-6.1.lib;vtkFiltersCore-6.1.lib;vtkCommonTransforms-6.1.lib;vtkCommonMath-6.1.lib;vtkDICOMParser-6.1.lib;PTCT_VTK_Core.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\PTCTViewer\Release;$(RT_MS_SDK_ROOT)\lib\Release\vtk\6.1.0\lib;$(RT_MS_SDK_ROOT)\lib\Release\rad_utils\2.0.0;$(RT_MS_SDK_ROOT)\lib\Release\rt_dicom_util\1.0.0;$(RT_MS_SDK_ROOT)\lib\Release\dcmtk\3.6.0.3;$(RT_MS_SDK_ROOT)\lib\Release\InstaRT;$(RT_MS_SDK_ROOT)\lib\Release\bcl\1.0.0;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
