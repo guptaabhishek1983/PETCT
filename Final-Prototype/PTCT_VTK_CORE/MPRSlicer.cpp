@@ -247,10 +247,10 @@ void MPRSlicer::InitSlicer(vtkSmartPointer<vtkMatrix4x4> p_orientationMatrix, MP
 	m_transform->GetOrientation(angle);
 	RAD_LOG_CRITICAL("Angle:" << angle[0] << ":" << angle[1] << ":" << angle[2]);
 	this->m_reslice->SetResliceAxes(m_transform->GetMatrix());
-	this->m_reslice->SetInterpolationModeToLinear();
+	this->m_reslice->InterpolateOff();
 	this->m_reslice->SetOutputDimensionality(2);
 	this->m_reslice->SetOutputSpacing(this->m_spacing);
-
+	this->m_reslice->SetInputData(this->m_inputImage);
 	this->m_inputImage->GetOrigin(m_origin);
 
 	this->ComputeOrientationMarkers();
@@ -302,7 +302,11 @@ image MPRSlicer::GetOutputImage()
 	}
 	this->m_transform->Print(cerr);*/
 
+	rad_timer t1;
+	t1.start();
 	this->m_outputImage = this->GetRawOutputImage();
+	t1.end();
+	RAD_LOG_CRITICAL("Slicer time:" << t1.getIntervalMilliseconds() << " ms.");
 	if (this->m_outputImage != NULL)
 	{
 		int outDim[3] = { 0, 0, 0 };
@@ -346,7 +350,10 @@ image MPRSlicer::GetOutputImage()
 		this->displayData = rad_get_memory(displayImage.height*displayImage.width*rad_sizeof(displayImage.type));
 		displayImage.data = this->displayData;
 
-		voi_lut_transform_image_fast(displayImage, in_dcm, this->m_ww, this->m_wl,
+		voi_lut_transform_image_fast(displayImage, 
+			in_dcm, 
+			this->m_ww, 
+			this->m_wl,
 			0, 255,
 			this->m_rs,
 			this->m_ri);
@@ -565,11 +572,11 @@ void MPRSlicer::ComputeOrientationMarkers()
 vtkSmartPointer<vtkImageData> MPRSlicer::GetRawOutputImage()
 {
 	this->m_reslice->SetResliceAxes(this->m_transform->GetMatrix());
-	this->m_reslice->SetInputData(this->m_inputImage);
-	this->m_reslice->SetOutputDimensionality(2);
+	//this->m_reslice->SetInputData(this->m_inputImage);
+	//this->m_reslice->SetOutputDimensionality(2);
 
 #ifdef LINEAR_INTERPOLATION
-	this->m_reslice->SetInterpolationModeToLinear();
+	//this->m_reslice->SetInterpolationModeToLinear();
 #else
 	this->m_reslice->SetInterpolationModeToCubic();
 #endif

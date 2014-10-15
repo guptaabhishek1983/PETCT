@@ -11,6 +11,7 @@ namespace ImageUtils
     {
         bool SetupLookupTable(string p_pathtolutfile);
         void GetLookupValue(int pixelValue, out int r, out int g, out int b);
-     
+        Color[] GetLookupColors();
+
     }
 }

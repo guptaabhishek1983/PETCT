@@ -227,7 +227,7 @@ namespace MPR_UI
                     e.ClipRectangle.Width / currentZoomFactor, e.ClipRectangle.Height / currentZoomFactor);
 
             Rectangle roundedRectangle = Rectangle.Round(imageRect);
-            e.Graphics.DrawRectangle(new Pen(Color.FromArgb(255, 0, 0)), roundedRectangle);
+            //e.Graphics.DrawRectangle(new Pen(Color.FromArgb(255, 0, 0)), roundedRectangle);
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
 
@@ -255,7 +255,7 @@ namespace MPR_UI
                 /// step4: displace pt_rect
                 pt_rect.Offset(displacement);
 
-                e.Graphics.DrawRectangle(new Pen(Color.Blue), pt_rect);
+              //  e.Graphics.DrawRectangle(new Pen(Color.Blue), pt_rect);
                 e.Graphics.DrawImage(this.m_pet_storedBitmap, pt_rect);
             }
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
@@ -304,19 +304,17 @@ namespace MPR_UI
                 cursorPath.Reset();
                 cursorPath.AddEllipse(cursorPosition.X - 5.0F, cursorPosition.Y - 5.0F, 10.0F, 10.0F);
                 cursorPath.CloseFigure();
-                e.Graphics.FillPath(p.Brush, cursorPath);
+              //  e.Graphics.FillPath(p.Brush, cursorPath);
             }
             
             // paint cursor
             if (this.m_mprCursor.l1 != null)
             {
-                e.Graphics.DrawLine(this.m_mprCursor.l1.DisplayPen,
-                    this.m_mprCursor.l1.P1.X, this.m_mprCursor.l1.P1.Y, this.m_mprCursor.l1.P2.X, this.m_mprCursor.l1.P2.Y);
+                //e.Graphics.DrawLine(this.m_mprCursor.l1.DisplayPen,                    this.m_mprCursor.l1.P1.X, this.m_mprCursor.l1.P1.Y, this.m_mprCursor.l1.P2.X, this.m_mprCursor.l1.P2.Y);
             }
             if (this.m_mprCursor.l2 != null)
             {
-                e.Graphics.DrawLine(this.m_mprCursor.l2.DisplayPen,
-                    this.m_mprCursor.l2.P1.X, this.m_mprCursor.l2.P1.Y, this.m_mprCursor.l2.P2.X, this.m_mprCursor.l2.P2.Y);
+           //     e.Graphics.DrawLine(this.m_mprCursor.l2.DisplayPen,                    this.m_mprCursor.l2.P1.X, this.m_mprCursor.l2.P1.Y, this.m_mprCursor.l2.P2.X, this.m_mprCursor.l2.P2.Y);
             }
 
             // paint side marker

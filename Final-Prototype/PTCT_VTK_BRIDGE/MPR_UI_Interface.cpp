@@ -14,7 +14,7 @@
 using namespace System;
 using namespace System::IO;
 using namespace System::Xml;
-
+using namespace System::Drawing;
 using namespace PTCT_VTK_BRIDGE;
 using namespace ImageUtils;
 using namespace EventDelegate_BRIDGE;
@@ -327,17 +327,31 @@ String^ MPR_UI_Interface::GetOrientationMarkerBottom(int axis)
 
 void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
 {
+	RAD_LOG_CRITICAL("************************");
+	rad_timer t1;
+	t1.start();
+
 	image ct_displayImage = this->m_mpr->GetOutputImage((Axis)axis);
+	t1.end();
+	RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate CT Resliced Image:" << t1.getIntervalMilliseconds() << " ms.");
 
+	t1.start();
 	BitmapWrapper^ ct_bmp = gcnew BitmapWrapper(ct_displayImage.data, ct_displayImage.width, ct_displayImage.height, "MONOCHROME");
+	t1.end();
+	
+	RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate CT BMP:" << t1.getIntervalMilliseconds() << " ms.");
 
-
+	t1.start();
 	image pt_displayImage = this->m_pt_mpr->GetOutputImage((Axis)axis);
+	t1.end();
+	RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate PT Resliced image:" << t1.getIntervalMilliseconds() << " ms.");
 
 	BitmapWrapper^ pt_bmp = nullptr;
 	// Apply LUT
+	applyLut = false;
 	if (applyLut)
 	{
+		t1.start();
 		U8Data r1 = (U8Data)rad_get_memory(pt_displayImage.size);
 		U8Data g1 = (U8Data)rad_get_memory(pt_displayImage.size);
 		U8Data b1 = (U8Data)rad_get_memory(pt_displayImage.size);
@@ -379,10 +393,16 @@ void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
 		rad_free_memory(g1);
 		rad_free_memory(b1);
 		die_image(_rgb_display_image);
+		t1.end();
+		RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate PT LUT image:" << t1.getIntervalMilliseconds() << " ms.");
 	}
 	else
 	{
+		t1.start();
 		pt_bmp = gcnew BitmapWrapper(pt_displayImage.data, pt_displayImage.width, pt_displayImage.height, "MONOCHROME");
+		pt_bmp->UpdatePalette(this->m_pet->GetLookupColors());
+		t1.end();
+		RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate PT LUT image:" << t1.getIntervalMilliseconds() << " ms.");
 	}
 
 	// resize
@@ -411,7 +431,7 @@ void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
 	double pt_pos = this->m_pt_mpr->GetCurrentImagePosition((Axis)axis);
 
 	EventDelegate_BRIDGE::EDB::Instance->RaiseUpdatePTCTImage(axis, ct_bmp, pt_bmp, translateX, translateY, ct_pos, pt_pos);
-
+	RAD_LOG_CRITICAL("************************");
 	return;
 
 }
