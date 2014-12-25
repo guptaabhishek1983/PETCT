@@ -111,6 +111,7 @@ namespace ImageUtils
                     isRGBImage = true;
                     this.bitmap = new Bitmap(width, height);
                     LockBitmap();
+                    
                     for (int y = 0; y < height; y++)
                     {
                         PixelData* pPixel = PixelAt(0, y);
@@ -448,6 +449,14 @@ namespace ImageUtils
             return;
 
         }
+        public void UpdatePalette(Color[] colors)
+        {
+            if (bitmap == null) return;
+            ColorPalette pal = bitmap.Palette;
+            for (int i = 0; i < 256; i++)
+                pal.Entries[i] = Color.FromArgb(125,colors[i].R, colors[i].G, colors[i].B);
+            bitmap.Palette = pal;
+        }
         #endregion
 
         public void MakeGrey()
@@ -470,7 +479,7 @@ namespace ImageUtils
             UnlockBitmap();
         }
 
-        private void SetGrayscalePalette()
+        public void SetGrayscalePalette()
         {
             if (bitmap == null) return;
             ColorPalette pal = bitmap.Palette;
@@ -478,6 +487,7 @@ namespace ImageUtils
                 pal.Entries[i] = Color.FromArgb(255, i, i, i);
             bitmap.Palette = pal;
         }
+
 
     }
 }

@@ -394,11 +394,6 @@ void MPR::Scroll(Axis axis, int delta)
 {
 	double spacing[3];
 	d->GetInput()->GetSpacing(spacing);
-
-	double pos[] = { 0, 0, 0 };
-	d->m_slicers[(int)axis]->GetTransform()->TransformPoint(pos, pos);
-	RAD_LOG_CRITICAL("Translation delta:" << delta);
-	RAD_LOG_CRITICAL("Initial Position x:" << pos[0] << " y:" << pos[1] << " z:" << pos[2]);
 	double _spacing = spacing[2];
 
 	switch (axis)
@@ -415,25 +410,8 @@ void MPR::Scroll(Axis axis, int delta)
 		default:
 			break;
 	}
-	double t[3] = { 0, 0, -delta*_spacing };
-	d->m_slicers[(int)axis]->GetTransform()->TransformPoint(t, t);
-	RAD_LOG_CRITICAL("Translation vector x:" << t[0] << " y:" << t[1] << " z:" << t[2]);
-	t[0] -= pos[0]; t[1] -= pos[1]; t[2] -= pos[2];
-	RAD_LOG_CRITICAL("After translation x:" << t[0] << " y:" << t[1] << " z:" << t[2]);
-	double bounds[] = { 0, 0, 0, 0, 0, 0 };
-	d->GetInput()->GetBounds(bounds);
-
-	for (int i = 0; i<3; i++)
-	{
-		double v = pos[i] + t[i];
-		if (v < bounds[i * 2] || v > bounds[i * 2 + 1])
-		{
-			RAD_LOG_CRITICAL("Going out of bounds. Returning")
-				return;
-		}
-	}
-
-	d->m_cursorTransform->Translate(t);
+	this->Scroll(axis, delta*_spacing);
+	
 }
 
 void MPR::Scroll2(Axis axis, float dx, float dy)
@@ -547,47 +525,53 @@ void MPR::GetCurrentSlicerPositionRelativeToIndex(Axis axis, double& xPos, doubl
 	xPos = fabs(out[0]);
 	yPos = fabs(out[1]);
 	double zPos = fabs(out[2]);
-	RAD_LOG_CRITICAL("************************");
+	/*RAD_LOG_CRITICAL("************************");
 	RAD_LOG_CRITICAL("Axis:" << axis);
 	RAD_LOG_CRITICAL("(VTK) Transform Pos:" << pos[0] << ":" << pos[1] << ":" << pos[2]);
 	RAD_LOG_CRITICAL("(VTK) Output origin:" << origin1[0] << ":" << origin1[1] << ":" << origin1[2]);
 	RAD_LOG_CRITICAL("(VTK Math) Position:" << out[0] << ":" << out[1] << ":" << out[2]);
 	RAD_LOG_CRITICAL("Pos:" << xPos << ":" << yPos << ":" << zPos);
-	RAD_LOG_CRITICAL("************************");
+	RAD_LOG_CRITICAL("************************");*/
 }
 
 void MPR::GetOutputImageDisplayDimensions(Axis axis, int& width, int& height)
 {
-	double spacing[3] = { 0, 0, 0 };
-	d->GetInput()->GetSpacing(spacing);
-	spacing[0] = fabs(spacing[0]);
-	spacing[1] = fabs(spacing[1]);
-	spacing[2] = fabs(spacing[2]);
+	
 	int dim[3] = { 0, 0, 0 };
-	d->GetInput()->GetDimensions(dim);
+	d->m_slicers[(int)axis]->GetRawOutputImage()->GetDimensions(dim);
+	width = dim[0];
+	height = dim[1];
+
+	/*d->GetInput()->GetDimensions(dim);
 	switch (axis)
 	{
 		case radspeed::AxialAxis:
 		{
-			width = dim[0] * spacing[0];
-			height = dim[1] * spacing[1];
+			width = dim[0] ;
+			height = dim[1];
 		}
 			break;
 		case radspeed::CoronalAxis:
 		{
-			width = dim[0] * spacing[0];
-			height = dim[2] * spacing[2];
+			width = dim[0] ;
+			height = dim[2];
 		}
 			break;
 		case radspeed::SagittalAxis:
 		{
-			width = dim[1] * spacing[1];
-			height = dim[2] * spacing[2];
+			width = dim[1] ;
+			height = dim[2];
 		}
 			break;
 		default:
 			break;
-	}
+	}*/
+	/*double spacing[3] = { 0, 0, 0 };
+	d->GetInput()->GetSpacing(spacing);
+	spacing[0] = fabs(spacing[0]);
+	spacing[1] = fabs(spacing[1]);
+	spacing[2] = fabs(spacing[2]);
+	*/
 }
 
 
@@ -645,6 +629,18 @@ void MPR::GetOrigin(double& x, double& y, double& z)
 vtkSmartPointer<vtkImageData> MPR::GetInput()
 {
 	return d->GetInput();
+}
+
+long int MPR::GetPixelIntensity(Axis axis, int x_pos, int y_pos)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (i == (int)axis)
+		{
+			return d->m_slicers[i]->GetPixelIntensity(x_pos, y_pos);
+		}
+	}
+	return 0;
 }
 
 void MPR::RotateAxesAlongPlane(int axis, int angle)

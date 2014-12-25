@@ -202,7 +202,7 @@ void MPRSlicer::InitSlicer(vtkSmartPointer<vtkMatrix4x4> p_orientationMatrix, MP
 	this->m_reslice = vtkSmartPointer<vtkImageReslice>::New();
 
 
-
+	this->m_reslice->SetOutputExtentToDefault();
 	this->m_transform = vtkSmartPointer<vtkTransform>::New();
 	this->m_transform->SetInput(mpr_transform->transform());
 	this->m_transform->Identity();
@@ -250,7 +250,7 @@ void MPRSlicer::InitSlicer(vtkSmartPointer<vtkMatrix4x4> p_orientationMatrix, MP
 	this->m_reslice->SetInterpolationModeToLinear();
 	this->m_reslice->SetOutputDimensionality(2);
 	this->m_reslice->SetOutputSpacing(this->m_spacing);
-
+	this->m_reslice->SetInputData(this->m_inputImage);
 	this->m_inputImage->GetOrigin(m_origin);
 
 	this->ComputeOrientationMarkers();
@@ -302,7 +302,11 @@ image MPRSlicer::GetOutputImage()
 	}
 	this->m_transform->Print(cerr);*/
 
+	rad_timer t1;
+	t1.start();
 	this->m_outputImage = this->GetRawOutputImage();
+	t1.end();
+	RAD_LOG_CRITICAL("Slicer time:" << t1.getIntervalMilliseconds() << " ms.");
 	if (this->m_outputImage != NULL)
 	{
 		int outDim[3] = { 0, 0, 0 };
@@ -346,7 +350,10 @@ image MPRSlicer::GetOutputImage()
 		this->displayData = rad_get_memory(displayImage.height*displayImage.width*rad_sizeof(displayImage.type));
 		displayImage.data = this->displayData;
 
-		voi_lut_transform_image_fast(displayImage, in_dcm, this->m_ww, this->m_wl,
+		voi_lut_transform_image_fast(displayImage, 
+			in_dcm, 
+			this->m_ww, 
+			this->m_wl,
 			0, 255,
 			this->m_rs,
 			this->m_ri);
@@ -565,8 +572,8 @@ void MPRSlicer::ComputeOrientationMarkers()
 vtkSmartPointer<vtkImageData> MPRSlicer::GetRawOutputImage()
 {
 	this->m_reslice->SetResliceAxes(this->m_transform->GetMatrix());
-	this->m_reslice->SetInputData(this->m_inputImage);
-	this->m_reslice->SetOutputDimensionality(2);
+	//this->m_reslice->SetInputData(this->m_inputImage);
+	//this->m_reslice->SetOutputDimensionality(2);
 
 #ifdef LINEAR_INTERPOLATION
 	this->m_reslice->SetInterpolationModeToLinear();
@@ -574,7 +581,7 @@ vtkSmartPointer<vtkImageData> MPRSlicer::GetRawOutputImage()
 	this->m_reslice->SetInterpolationModeToCubic();
 #endif
 	this->m_reslice->Update();
-
+	RAD_LOG_CRITICAL("Opimization:" << this->m_reslice->GetOptimization());
 	this->m_outputImage = this->m_reslice->GetOutput();
 	return this->m_outputImage;
 }
@@ -590,44 +597,6 @@ long int MPRSlicer::GetPixelIntensity(int x_pos, int y_pos)
 	{
 		value = this->GetRawOutputImage()->GetScalarComponentAsDouble(x_pos, y_pos, 0, 0);
 	}
-	/*int dataType = this->GetRawOutputImage()->GetScalarType();
-	switch (dataType)
-	{
-	case VTK_UNSIGNED_CHAR:
-	{
-	unsigned char* pixelData = (unsigned char*)this->GetRawOutputImage()->GetScalarPointer();
-	value = pixelData[y_pos*dim[1] + x_pos];
-	}
-	break;
-
-	case VTK_UNSIGNED_INT:
-	{
-	unsigned int* pixelData = (unsigned int*)this->GetRawOutputImage()->GetScalarPointer();
-	value = pixelData[y_pos*dim[1] + x_pos];
-	}
-	break;
-	case VTK_UNSIGNED_SHORT:
-	{
-	unsigned short* pixelData = (unsigned short*)this->GetRawOutputImage()->GetScalarPointer();
-	value = pixelData[y_pos*dim[1] + x_pos];
-	}
-	break;
-	case VTK_SHORT:
-	{
-	short* pixelData = (short*)this->GetRawOutputImage()->GetScalarPointer();
-	value = pixelData[y_pos*dim[1] + x_pos];
-	}
-	break;
-	default:
-	{
-	RAD_LOG_CRITICAL("Unknown data type:" << dataType);
-	}
-	break;
-	}*/
-
-	/*signed short int* pixelData = (signed short int*)this->GetRawOutputImage()->GetScalarPointer();
-	value = pixelData[y_pos*dim[1] + x_pos];*/
-	/* Applying the rescale slope & rescale intercept */
 	value = (long int)(((double)value*this->m_rs) + this->m_ri);
 	return (value);
 }

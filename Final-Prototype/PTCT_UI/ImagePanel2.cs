@@ -16,6 +16,10 @@ namespace MPR_UI
     {
         public delegate void MPRCursorTranslated(Point p);
         public event MPRCursorTranslated EVT_MPRCursorTranslated;
+
+        public delegate void RaisePixelIntensity(Point p);
+        public event RaisePixelIntensity EVT_RaisePixelIntensity;
+
         private Bitmap m_storedBitmap;
         private Bitmap m_pet_storedBitmap;
         private struct MPRCursor
@@ -197,13 +201,21 @@ namespace MPR_UI
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
+            Point p = this.GetOriginalCoords(new Point(e.X, e.Y));
+
             if (e.Button == System.Windows.Forms.MouseButtons.Left && MPRCursorSelected == true) 
             {
-                Point p = this.GetOriginalCoords(new Point(e.X, e.Y));
-                //Point pDiff = new Point(e.X - lastMousePositionORG.X, e.Y - lastMousePositionORG.Y);
                 EVT_MPRCursorTranslated(p);
             }
+            {
+                // raise event for pixel intensity & PT SUV
+                if (EVT_RaisePixelIntensity != null)
+                {
+                    // find corresponding P in PET box
 
+                    EVT_RaisePixelIntensity(new Point((int)(p.X), (int)(p.Y)));
+                }
+            }
             if (objectSelected == true)
             {
                 objectLocation = e.Location;
@@ -233,6 +245,8 @@ namespace MPR_UI
 
             e.Graphics.DrawImage(StoreBitmap, e.ClipRectangle, srcRect, GraphicsUnit.Pixel);
 
+            Point pet_p = new Point(0, 0);
+
             if (m_pet_storedBitmap != null)
             {
                 ///step1: find the center of CT Image rect
@@ -255,9 +269,19 @@ namespace MPR_UI
                 /// step4: displace pt_rect
                 pt_rect.Offset(displacement);
 
-                e.Graphics.DrawRectangle(new Pen(Color.Blue), pt_rect);
+                
+              //  e.Graphics.DrawRectangle(new Pen(Color.Blue), pt_rect);
                 e.Graphics.DrawImage(this.m_pet_storedBitmap, pt_rect);
+
+                using(Graphics gg = Graphics.FromImage(this.m_pet_storedBitmap))
+                {
+
+                }
+
             }
+
+            
+
             e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
             e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
             Pen p = new Pen(Color.Gold, 10.0F);
@@ -287,16 +311,21 @@ namespace MPR_UI
                 _sb.Append(imgControl.PetSlicerPosition);
                 e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, currY));
                 currY += 20;
+                
                 _sb.Clear();
-                _sb.Append("Slicer idx#");
-                _sb.Append(imgControl.Index);
+                _sb.Append("X:").Append(lastMousePosition.X).Append(" Y:").Append(lastMousePosition.Y).Append(" Val:").Append(imgControl.HU);
+                e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, currY));
+                currY += 20;
+
+                _sb.Clear();
+                _sb.Append("X:").Append(imgControl.PET_MouseLocation.X).Append(" Y:").Append(imgControl.PET_MouseLocation.Y).Append(" Val:").Append(imgControl.SUV) ;
                 e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, currY));
                 currY += 20;
 
                 _sb.Clear();
                 _sb.Append("Zoom#");
                 _sb.Append(currentZoomFactor);
-                e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, 80));
+                e.Graphics.DrawString(_sb.ToString(), _font, _pen1.Brush, new PointF(10, currY));
             }
 
             if (cursorPosition != null)
@@ -304,19 +333,17 @@ namespace MPR_UI
                 cursorPath.Reset();
                 cursorPath.AddEllipse(cursorPosition.X - 5.0F, cursorPosition.Y - 5.0F, 10.0F, 10.0F);
                 cursorPath.CloseFigure();
-                e.Graphics.FillPath(p.Brush, cursorPath);
+              //  e.Graphics.FillPath(p.Brush, cursorPath);
             }
             
             // paint cursor
             if (this.m_mprCursor.l1 != null)
             {
-                e.Graphics.DrawLine(this.m_mprCursor.l1.DisplayPen,
-                    this.m_mprCursor.l1.P1.X, this.m_mprCursor.l1.P1.Y, this.m_mprCursor.l1.P2.X, this.m_mprCursor.l1.P2.Y);
+                //e.Graphics.DrawLine(this.m_mprCursor.l1.DisplayPen,                    this.m_mprCursor.l1.P1.X, this.m_mprCursor.l1.P1.Y, this.m_mprCursor.l1.P2.X, this.m_mprCursor.l1.P2.Y);
             }
             if (this.m_mprCursor.l2 != null)
             {
-                e.Graphics.DrawLine(this.m_mprCursor.l2.DisplayPen,
-                    this.m_mprCursor.l2.P1.X, this.m_mprCursor.l2.P1.Y, this.m_mprCursor.l2.P2.X, this.m_mprCursor.l2.P2.Y);
+           //     e.Graphics.DrawLine(this.m_mprCursor.l2.DisplayPen,                    this.m_mprCursor.l2.P1.X, this.m_mprCursor.l2.P1.Y, this.m_mprCursor.l2.P2.X, this.m_mprCursor.l2.P2.Y);
             }
 
             // paint side marker

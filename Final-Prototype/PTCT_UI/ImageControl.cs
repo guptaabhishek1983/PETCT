@@ -35,10 +35,31 @@ namespace MPR_UI
             this.m_imagePanel = new ImagePanel2();
             this.m_imagePanel.Dock = DockStyle.Fill;
             this.m_imagePanel.EVT_MPRCursorTranslated += TranslateMPRCursor;
+            this.m_imagePanel.EVT_RaisePixelIntensity += RaisePixelIntensity;
             this.panel1.Controls.Add(this.m_imagePanel);
             m_UIInterface = MPR_UI_Interface.GetHandle();
             EventDelegate_BRIDGE.EDB.Instance.EVT_UpdatePTCTImage += Handle_UpdatePTCTImage;
             EventDelegate_BRIDGE.EDB.Instance.EVT_UpdateCursorPos+=Handle_UpdateCursorPos;
+            EventDelegate_BRIDGE.EDB.Instance.EVT_PixelIntensityAndSUV+=PixelIntensityAndSUV;
+        }
+
+        private void PixelIntensityAndSUV(int axis, int pt_pos_x, int pt_pos_y, double suv, int hu)
+        {
+            PET_MouseLocation = new Point(pt_pos_x, pt_pos_y);
+            SUV = suv;
+            HU = hu;
+        }
+
+        private void RaisePixelIntensity(Point p)
+        {
+            if (m_axis == Axis.SagittalAxis)
+            {
+                int val = this.m_UIInterface.GetPixelIntensity((int)m_axis, p.X, p.Y);
+            }
+                //RectangleF rect = new RectangleF(0, 0, 200, 200);
+                //PointF rect1_origin = new PointF(m_imagePanel.imageRect.Left, m_imagePanel.imageRect.Top);
+                //PointF rect2_origin = new PointF(0,0);
+            
         }
 
         private void Handle_UpdatePTCTImage(int axis, BitmapWrapper ct_bmp, BitmapWrapper pt_bmp, double pt_pos_x, double pt_pos_y, double ct_pos, double pt_pos)
@@ -204,5 +225,11 @@ namespace MPR_UI
         public int ScrollBarCurrentVal { get; set; }
 
         public double PetSlicerPosition { get; set; }
+
+        public Point PET_MouseLocation { get; set; }
+
+        public double SUV { get; set; }
+
+        public int HU { get; set; }
     }
 }

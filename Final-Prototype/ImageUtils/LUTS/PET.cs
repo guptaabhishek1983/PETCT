@@ -11,6 +11,7 @@ namespace ImageUtils
     public class PET:ILUT
     {
         Dictionary<int, Color> lut = new Dictionary<int, Color>();
+        List<Color> colors = new List<Color>();
         #region ILUT Members
 
         public bool SetupLookupTable(string p_pathtolutfile)
@@ -61,6 +62,7 @@ namespace ImageUtils
                 for(int i=0; i<blue.Count; i++)
                 {
                     lut.Add(Convert.ToInt16(i), Color.FromArgb(red[i], green[i], blue[i]));
+                    colors.Add(Color.FromArgb(red[i], green[i], blue[i]));
                 }
             }
             else
@@ -71,7 +73,11 @@ namespace ImageUtils
         }
 
         
+        public Color[] GetLookupColors()
+        {
 
+            return colors.ToArray();
+        }
         public void GetLookupValue(int pixelValue, out int r, out int g, out int b)
         {
             r = Color.Transparent.R;
