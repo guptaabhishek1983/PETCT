@@ -78,8 +78,17 @@ void MPR_UI_Interface::Init_PT_MPR(String^ path)
 		const char* dicomFile = convert_to_const_charPtr(_strFile);
 		fileNames.push_back(dicomFile);
 	}
+
+	RadRTDicomInterface* pDicom = new RTDcmtkDicomInterface(fileNames.at(0).c_str());
+	this->m_suv_computation = new SUVComputation();
+
+	this->m_suv_computation->SetParams((RTDcmtkDicomInterface*)pDicom);
+
 	this->m_pt_mpr->initFromDir1(fileNames);
 	
+	long int pixVal = this->m_pt_mpr->GetPixelIntensity(AxialAxis, 93, 96);
+	double suv = this->m_suv_computation->GetSUV(pixVal);
+	RAD_LOG_CRITICAL("SUV Value:" << suv);
 }
 
 BitmapWrapper^ MPR_UI_Interface::GetDisplayImage(int axis)
@@ -337,6 +346,7 @@ void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
 
 	t1.start();
 	BitmapWrapper^ ct_bmp = gcnew BitmapWrapper(ct_displayImage.data, ct_displayImage.width, ct_displayImage.height, "MONOCHROME");
+	ct_bmp->SetGrayscalePalette();
 	t1.end();
 	
 	RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate CT BMP:" << t1.getIntervalMilliseconds() << " ms.");
@@ -351,56 +361,57 @@ void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
 	applyLut = false;
 	if (applyLut)
 	{
-		t1.start();
-		U8Data r1 = (U8Data)rad_get_memory(pt_displayImage.size);
-		U8Data g1 = (U8Data)rad_get_memory(pt_displayImage.size);
-		U8Data b1 = (U8Data)rad_get_memory(pt_displayImage.size);
+		//t1.start();
+		//U8Data r1 = (U8Data)rad_get_memory(pt_displayImage.size);
+		//U8Data g1 = (U8Data)rad_get_memory(pt_displayImage.size);
+		//U8Data b1 = (U8Data)rad_get_memory(pt_displayImage.size);
 
-		for (int i = 0; i < pt_displayImage.size; i++)
-		{
-			int r, g, b;
-			this->m_pet->GetLookupValue(((U8Data)pt_displayImage.data)[i], r, g, b);
-			r1[i] = r;
-			g1[i] = g;
-			b1[i] = b;
-		}
+		//for (int i = 0; i < pt_displayImage.size; i++)
+		//{
+		//	int r, g, b;
+		//	this->m_pet->GetLookupValue(((U8Data)pt_displayImage.data)[i], r, g, b);
+		//	r1[i] = r;
+		//	g1[i] = g;
+		//	b1[i] = b;
+		//}
 
-		image _rgb_display_image = ::born_image();
-		_rgb_display_image.height = pt_displayImage.height;
-		_rgb_display_image.width = pt_displayImage.width;
-		_rgb_display_image.size = pt_displayImage.size;
-		_rgb_display_image.data = rad_get_memory(pt_displayImage.size*rad_sizeof(TYPE_U32Data));
+		//image _rgb_display_image = ::born_image();
+		//_rgb_display_image.height = pt_displayImage.height;
+		//_rgb_display_image.width = pt_displayImage.width;
+		//_rgb_display_image.size = pt_displayImage.size;
+		//_rgb_display_image.data = rad_get_memory(pt_displayImage.size*rad_sizeof(TYPE_U32Data));
 
-		unsigned char*p = NULL;
+		//unsigned char*p = NULL;
 
-		for (u_int i = 0; i<pt_displayImage.size; i++)
-		{
-			p = (unsigned char*)((U32Data)_rgb_display_image.data + i);
-			*p = b1[i];
-			p++;
-			*p = g1[i];
-			p++;
-			*p = r1[i];
-			p++;
-			*p = 125;
-		}
+		//for (u_int i = 0; i<pt_displayImage.size; i++)
+		//{
+		//	p = (unsigned char*)((U32Data)_rgb_display_image.data + i);
+		//	*p = b1[i];
+		//	p++;
+		//	*p = g1[i];
+		//	p++;
+		//	*p = r1[i];
+		//	p++;
+		//	*p = 125;
+		//}
 
-		//decode_rgb_to_argb(r1, g1, b1, (U32Data)_rgb_display_image.data, displayImage.size);
+		////decode_rgb_to_argb(r1, g1, b1, (U32Data)_rgb_display_image.data, displayImage.size);
 
-		pt_bmp = gcnew BitmapWrapper(_rgb_display_image.data, _rgb_display_image.width, _rgb_display_image.height, "RGB");
-		pt_bmp->ChangeImageOpacity(0.7);
-		rad_free_memory(r1);
-		rad_free_memory(g1);
-		rad_free_memory(b1);
-		die_image(_rgb_display_image);
-		t1.end();
-		RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate PT LUT image:" << t1.getIntervalMilliseconds() << " ms.");
+		//pt_bmp = gcnew BitmapWrapper(_rgb_display_image.data, _rgb_display_image.width, _rgb_display_image.height, "RGB");
+		//pt_bmp->ChangeImageOpacity(0.7);
+		//rad_free_memory(r1);
+		//rad_free_memory(g1);
+		//rad_free_memory(b1);
+		//die_image(_rgb_display_image);
+		//t1.end();
+		//RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate PT LUT image:" << t1.getIntervalMilliseconds() << " ms.");
 	}
 	else
 	{
 		t1.start();
 		pt_bmp = gcnew BitmapWrapper(pt_displayImage.data, pt_displayImage.width, pt_displayImage.height, "MONOCHROME");
 		pt_bmp->UpdatePalette(this->m_pet->GetLookupColors());
+		
 		t1.end();
 		RAD_LOG_CRITICAL("Axis:" << axis << ". Time taken to generate PT LUT image:" << t1.getIntervalMilliseconds() << " ms.");
 	}
@@ -420,10 +431,13 @@ void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
 	double pt_origin[3] = { 0, 0, 0 };
 	pt_cuboid->GetOrigin(pt_origin);
 
-	pt_bmp->Resize(pt_displayImage .width *(pt_spacing[0] / ct_spacing[0]),
+	pt_bmp->Resize(pt_displayImage.width *(pt_spacing[0] / ct_spacing[0]),
 		pt_displayImage.height * (pt_spacing[1] / ct_spacing[1]));
-
-
+	if (axis == (int)Axis::AxialAxis)
+	{
+		pt_bmp->StoredBitmap->Save("D:\\PT.jpg");
+		ct_bmp->StoredBitmap->Save("D:\\CT.jpg");
+	}
 	double translateX = (ct_origin[0] - pt_origin[0]) / ct_spacing[0];
 	double translateY = (ct_origin[1] - pt_origin[1]) / ct_spacing[1];
 
@@ -438,6 +452,38 @@ void MPR_UI_Interface::UpdateDisplay(int axis, bool applyLut)
 void MPR_UI_Interface::InitDisplay(int axis)
 {
 	UpdateDisplay(axis, true);
+}
+
+long int MPR_UI_Interface::GetPixelIntensity(int axis, int pos_x, int pos_y)
+{
+	if (this->m_mpr == NULL) return 0.0;
+
+	long int val = this->m_mpr->GetPixelIntensity((Axis)axis, pos_x, pos_y);
+
+	//-- compute SUV
+	//--- compute scaling factor
+	int ct_w, ct_h;
+	this->m_mpr->GetOutputImageDisplayDimensions((Axis)axis, ct_w, ct_h);
+	int pt_w, pt_h;
+	this->m_pt_mpr->GetOutputImageDisplayDimensions((Axis)axis, pt_w, pt_h);
+	RAD_LOG_CRITICAL("CT W/H:" << ct_w << "/" << ct_h);
+	RAD_LOG_CRITICAL("PT W/H:" << pt_w << "/" << pt_h);
+
+	float sx = (float)(ct_w*1.0 / pt_w*1.0);
+	float sy = (float)(ct_h*1.0 / pt_h*1.0);
+	RAD_LOG_CRITICAL("sx:" << sx << " sy:" << sy);
+
+	int pt_pos_x = ceil(pos_x/sx);
+	int pt_pos_y = ceil(pos_y/sy);
+	RAD_LOG_CRITICAL("sx:" << sx << " sy:" << sy);
+
+	long int pt_val = this->m_pt_mpr->GetPixelIntensity((Axis)axis, pt_pos_x, pt_pos_y);
+	double suv = this->m_suv_computation->GetSUV(pt_val);
+	RAD_LOG_CRITICAL("pt_pos_x:" << pt_pos_x << " pt_pos_y:" << pt_pos_y << " SUV:" << suv);
+	EventDelegate_BRIDGE::EDB::Instance->RaisePixelIntensityAndSUV(axis, pt_pos_x, pt_pos_y, suv, val);
+
+	return val;
+
 }
 // meddiff includes
 #include "rad_util.h"

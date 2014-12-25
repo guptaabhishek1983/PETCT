@@ -536,36 +536,42 @@ void MPR::GetCurrentSlicerPositionRelativeToIndex(Axis axis, double& xPos, doubl
 
 void MPR::GetOutputImageDisplayDimensions(Axis axis, int& width, int& height)
 {
-	double spacing[3] = { 0, 0, 0 };
-	d->GetInput()->GetSpacing(spacing);
-	spacing[0] = fabs(spacing[0]);
-	spacing[1] = fabs(spacing[1]);
-	spacing[2] = fabs(spacing[2]);
+	
 	int dim[3] = { 0, 0, 0 };
-	d->GetInput()->GetDimensions(dim);
+	d->m_slicers[(int)axis]->GetRawOutputImage()->GetDimensions(dim);
+	width = dim[0];
+	height = dim[1];
+
+	/*d->GetInput()->GetDimensions(dim);
 	switch (axis)
 	{
 		case radspeed::AxialAxis:
 		{
-			width = dim[0] * spacing[0];
-			height = dim[1] * spacing[1];
+			width = dim[0] ;
+			height = dim[1];
 		}
 			break;
 		case radspeed::CoronalAxis:
 		{
-			width = dim[0] * spacing[0];
-			height = dim[2] * spacing[2];
+			width = dim[0] ;
+			height = dim[2];
 		}
 			break;
 		case radspeed::SagittalAxis:
 		{
-			width = dim[1] * spacing[1];
-			height = dim[2] * spacing[2];
+			width = dim[1] ;
+			height = dim[2];
 		}
 			break;
 		default:
 			break;
-	}
+	}*/
+	/*double spacing[3] = { 0, 0, 0 };
+	d->GetInput()->GetSpacing(spacing);
+	spacing[0] = fabs(spacing[0]);
+	spacing[1] = fabs(spacing[1]);
+	spacing[2] = fabs(spacing[2]);
+	*/
 }
 
 
@@ -623,6 +629,18 @@ void MPR::GetOrigin(double& x, double& y, double& z)
 vtkSmartPointer<vtkImageData> MPR::GetInput()
 {
 	return d->GetInput();
+}
+
+long int MPR::GetPixelIntensity(Axis axis, int x_pos, int y_pos)
+{
+	for (int i = 0; i < 3; i++)
+	{
+		if (i == (int)axis)
+		{
+			return d->m_slicers[i]->GetPixelIntensity(x_pos, y_pos);
+		}
+	}
+	return 0;
 }
 
 void MPR::RotateAxesAlongPlane(int axis, int angle)

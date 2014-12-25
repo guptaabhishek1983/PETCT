@@ -454,7 +454,7 @@ namespace ImageUtils
             if (bitmap == null) return;
             ColorPalette pal = bitmap.Palette;
             for (int i = 0; i < 256; i++)
-                pal.Entries[i] = Color.FromArgb(179, colors[i].R, colors[i].G, colors[i].B);
+                pal.Entries[i] = Color.FromArgb(125,colors[i].R, colors[i].G, colors[i].B);
             bitmap.Palette = pal;
         }
         #endregion
@@ -479,7 +479,7 @@ namespace ImageUtils
             UnlockBitmap();
         }
 
-        private void SetGrayscalePalette()
+        public void SetGrayscalePalette()
         {
             if (bitmap == null) return;
             ColorPalette pal = bitmap.Palette;

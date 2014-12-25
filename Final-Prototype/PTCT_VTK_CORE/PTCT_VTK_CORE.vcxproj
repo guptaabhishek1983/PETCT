@@ -86,12 +86,14 @@
     <ClInclude Include="MPROrientation.h" />
     <ClInclude Include="MPRSlicer.h" />
     <ClInclude Include="MPRTransform.h" />
+    <ClInclude Include="SUVComputation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MPR.cpp" />
     <ClCompile Include="MPROrientation.cpp" />
     <ClCompile Include="MPRSlicer.cpp" />
     <ClCompile Include="MPRTransform.cpp" />
+    <ClCompile Include="SUVComputation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

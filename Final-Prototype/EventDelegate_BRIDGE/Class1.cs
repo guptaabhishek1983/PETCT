@@ -97,5 +97,30 @@ namespace EventDelegate_BRIDGE
             }
         }
 #endregion
+
+        #region Pixel intensity and SUV
+        public delegate void PixelIntensityAndSUV(int axis, int pt_pos_x, int pt_pos_y, double suv, int hu);
+
+        private PixelIntensityAndSUV m_pixelIntensityAndSUV;
+
+        public event PixelIntensityAndSUV EVT_PixelIntensityAndSUV
+        {
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            add
+            {
+                m_pixelIntensityAndSUV = (PixelIntensityAndSUV)Delegate.Combine(m_pixelIntensityAndSUV, value);
+            }
+            [MethodImpl(MethodImplOptions.Synchronized)]
+            remove
+            {
+                m_pixelIntensityAndSUV = (PixelIntensityAndSUV)Delegate.Remove(m_pixelIntensityAndSUV, value);
+            }
+        }
+        
+        public void RaisePixelIntensityAndSUV(int axis, int pt_pos_x, int pt_pos_y, double suv, int hu)
+        {
+            m_pixelIntensityAndSUV.Invoke(axis, pt_pos_x, pt_pos_y, suv, hu);
+        }
+        #endregion
     }
 }

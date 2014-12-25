@@ -4,6 +4,7 @@
 
 using namespace System;
 #include "MPR.h"
+#include "SUVComputation.h"
 
 using namespace radspeed;
 using namespace ImageUtils;
@@ -17,7 +18,7 @@ namespace PTCT_VTK_BRIDGE {
 		static MPR_UI_Interface^ m_handle;
 		MPR* m_mpr;
 		MPR* m_pt_mpr;
-
+		SUVComputation* m_suv_computation;
 		PET^ m_pet;
 		
 		BitmapWrapper^ ct_bmp;
@@ -46,6 +47,7 @@ namespace PTCT_VTK_BRIDGE {
 
 		void InitDisplay(int axis);
 		void RaiseSlicerPositionUpdate(int axis);
+		long int GetPixelIntensity(int axis, int pos_x, int pos_y);
 		// PT-CT Winform2 porject calls.
 
 		void LoadImages(String^ ctImage, String^ ptImage);
